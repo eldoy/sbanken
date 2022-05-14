@@ -1,6 +1,6 @@
 const superagent = require('superagent')
 var btoa = require('btoa')
-var { clientid, secret } = require('./sbanken.json')
+var { clientid, secret } = require(process.cwd() + '/sbanken.json')
 
 function request(url, options = {}) {
   const { method = 'get', params = '', auth } = options
