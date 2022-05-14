@@ -18,6 +18,7 @@ Add a file called 'sbanken.json' in your application's root directory:
   "clientid": "APP_CLIENT_ID",
   "secret": "APP_SECRET"
 }
+```
 
 The following usage has been implemented:
 
