@@ -1,0 +1,19 @@
+{
+  "name": "sbanken",
+  "version": "0.1.0",
+  "description": "Unofficial Sbanken API Library",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo 'no test runner installed'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eldoy/sbanken"
+  },
+  "author": "Vidar Eldøy <vidar@eldoy.com>",
+  "license": "MIT",
+  "dependencies": {
+    "btoa": "^1.2.1",
+    "superagent": "^7.1.3"
+  }
+}
