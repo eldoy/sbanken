@@ -34,6 +34,7 @@ function getConfig(config) {
   if (!secret) {
     throw new Error('secret missing')
   }
+  return config
 }
 
 function getAccessToken(config) {
