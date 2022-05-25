@@ -1,6 +1,5 @@
 const superagent = require('superagent')
 var btoa = require('btoa')
-var { clientid, secret } = require(process.cwd() + '/sbanken.json')
 
 function request(url, options = {}) {
   const { method = 'get', params = '', auth } = options
@@ -20,7 +19,26 @@ function request(url, options = {}) {
   })
 }
 
-function getAccessToken() {
+function getConfig(config) {
+  if (!config) {
+    try {
+      config = require(process.cwd() + '/sbanken.json')
+    } catch(e) {
+      config = {}
+    }
+  }
+  const { clientid, secret } = config
+  if (!clientid) {
+    throw new Error('clientid missing')
+  }
+  if (!secret) {
+    throw new Error('secret missing')
+  }
+}
+
+function getAccessToken(config) {
+  const { clientid, secret } = getConfig(config)
+
   var url = 'https://auth.sbanken.no/identityserver/connect/token'
 
   var auth = btoa(encodeURIComponent(clientid) + ':' + encodeURIComponent(secret))

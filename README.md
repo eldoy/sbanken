@@ -29,6 +29,12 @@ const api = require('sbanken')
 // Get an access token
 const { access_token } = await api.getAccessToken()
 
+// Override credentials
+const { access_token } = await api.getAccessToken({
+  clientid: 'APP_CLIENT_ID',
+  secret: 'APP_SECRET'
+})
+
 // Get accounts
 const accounts = await api.getAccountDetails(access_token)
 
