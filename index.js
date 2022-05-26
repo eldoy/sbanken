@@ -6,6 +6,7 @@ function request(url, options = {}) {
   return new Promise(function(resolve, reject) {
     superagent[method](url)
     .send(params)
+    .query({})
     .set('Authorization', auth)
     .set('Accept', 'application/json')
     .end(function(err, res){
@@ -61,7 +62,6 @@ function getAccountNumberDetails(accountNumber, token) {
   var url = 'https://publicapi.sbanken.no/apibeta/api/v2/accounts/' + accountNumber
 
   return request(url, { auth: 'Bearer ' + token })
-
 }
 
 function getAccountTransactions(accountNumber, token) {
