@@ -27,4 +27,10 @@ it['should fetch transactions for account'] = async function() {
   assert.ok(Array.isArray(result.items))
 }
 
+it['should fetch transactions with query'] = async function() {
+  const result = await api('transaction/find', { account_id, length: 1 })
+  assert.ok(result.items.length == 1)
+  assert.ok(Array.isArray(result.items))
+}
+
 module.exports = it

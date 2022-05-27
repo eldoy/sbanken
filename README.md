@@ -25,6 +25,23 @@ const token = await api('token/create')
 // Get accounts
 const accounts = await api('account/find')
 
+// Example response
+{
+  availableItems: 1,
+  items: [
+    {
+      accountId: 'AAABBBCCC111222333',
+      accountNumber: '97101778369',
+      ownerCustomerId: '16118855566',
+      name: 'LØNNSKONTO',
+      accountType: 'Standard account',
+      available: 132379.9,
+      balance: 136864.9,
+      creditLimit: 0
+    }
+  ]
+}
+
 // Get account info
 // 'id' is the accountId from account/find, not the actual account number
 const account = await api('account/get', { id })
@@ -57,6 +74,30 @@ const transactions = await api('transaction/find', {
   index: 0,
   length: 100
 })
+
+// Example response
+{
+  availableItems: 8,
+  items: [
+    {
+      accountingDate: '2022-05-25T00:00:00',
+      interestDate: '2022-05-24T00:00:00',
+      otherAccountNumberSpecified: false,
+      amount: -12000,
+      text: 'Description',
+      transactionType: 'NETTGIRO',
+      transactionTypeCode: 203,
+      transactionTypeText: 'NETTGIRO',
+      isReservation: false,
+      reservationType: null,
+      source: 'Archive',
+      cardDetailsSpecified: false,
+      transactionDetailSpecified: false
+    }
+  ]
+}
 ```
+
+The `transaction/find` availableItems is the total possible matches, the items adhere to the `length` parameter.
 
 MIT Licensed. Enjoy!

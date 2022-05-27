@@ -40,11 +40,11 @@ module.exports = function({ clientid, secret } = {}) {
       throw new Error('token not found')
     }
 
-    const auth = { auth: 'Bearer ' + token }
+    const auth = 'Bearer ' + token
 
     // Find all accounts
     if (action == 'account/find') {
-      return request(APIBASE + 'accounts', auth)
+      return request(APIBASE + 'accounts', { auth })
     }
 
     // Get single account
@@ -53,7 +53,7 @@ module.exports = function({ clientid, secret } = {}) {
       if (!id) {
         throw new Error("required parameter 'id' missing")
       }
-      return request(APIBASE + 'accounts/' + id, auth)
+      return request(APIBASE + 'accounts/' + id, { auth })
     }
 
     // Get transactions for account
@@ -68,7 +68,7 @@ module.exports = function({ clientid, secret } = {}) {
       if (typeof query.endDate == 'object') {
         query.endDate = format(query.endDate)
       }
-      return request(APIBASE + 'transactions/' + account_id, auth, query)
+      return request(APIBASE + 'transactions/' + account_id, { auth, query })
     }
   }
 }
