@@ -26,10 +26,14 @@ const token = await api('token/create')
 const accounts = await api('account/find')
 
 // Get account info
-// 'id' is the account id from account/find, not the actual account number
+// 'id' is the accountId from account/find, not the actual account number
 const account = await api('account/get', { id })
 
 // Get transactions
+/* account_id: string
+Required. The accountId from account/find
+*/
+
 /* startDate: string
 Optional. The start of the query time span. Must be less than or equal to endDate, and less than or equal to the current date + 1 day. Default value is endDate -30 days. Minimum value is 2000-01-01
 */
@@ -47,6 +51,7 @@ Optional. Return a number of items items up to this value. Minimum value is 1, m
 */
 
 const transactions = await api('transaction/find', {
+  account_id: '93454A0332...',
   startDate: '-30',
   endDate: new Date(),
   index: 0,
