@@ -58,9 +58,9 @@ module.exports = function({ clientid, secret } = {}) {
 
     // Get transactions for account
     if (action == 'transaction/find') {
-      const { id, ...query } = params
-      if (!id) {
-        throw new Error("required parameter 'id' missing")
+      const { account_id, ...query } = params
+      if (!account_id) {
+        throw new Error("required parameter 'account_id' missing")
       }
       if (typeof query.startDate == 'object') {
         query.startDate = format(query.startDate)
@@ -68,7 +68,7 @@ module.exports = function({ clientid, secret } = {}) {
       if (typeof query.endDate == 'object') {
         query.endDate = format(query.endDate)
       }
-      return request(APIBASE + 'transactions/' + id, auth, query)
+      return request(APIBASE + 'transactions/' + account_id, auth, query)
     }
   }
 }
