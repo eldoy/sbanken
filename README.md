@@ -12,38 +12,43 @@ npm i sbanken
 
 ### Usage
 
-Add a file called 'sbanken.json' in your application's root directory:
-```json
-{
-  "clientid": "APP_CLIENT_ID",
-  "secret": "APP_SECRET"
-}
-```
-
-The following usage has been implemented:
-
 ```js
 // Require lib
-const api = require('sbanken')
-
-// Get an access token
-const { access_token } = await api.getAccessToken()
-
-// Override credentials
-const { access_token } = await api.getAccessToken({
+const api = require('sbanken')({
   clientid: 'APP_CLIENT_ID',
   secret: 'APP_SECRET'
 })
 
 // Get accounts
-const accounts = await api.getAccountDetails(access_token)
+const accounts = await api('account/find')
 
 // Get account info
-// 'id' is the account id, not the actual account number
-const account = await api.getAccountNumberDetails(id, access_token)
+// 'id' is the account id from account/find, not the actual account number
+const account = await api('account/get', { id })
 
 // Get transactions
-const transactions = await api.getAccountTransactions(id, access_token)
+/* startDate: string
+Optional. The start of the query time span. Must be less than or equal to endDate, and less than or equal to the current date + 1 day. Default value is endDate -30 days. Minimum value is 2000-01-01
+*/
+
+/* endDate: string
+Optional. The end of the query time span. Must be greater than or equal to startDate, and less than or equal to the current date +1 day. Query cannot span more than 366 days. Default value is the current date.
+*/
+
+/* index: int
+Optional. The index of the first item to be retrieved. Minimum value is 0, which is the first item within the query time span. Default value is 0.
+*/
+
+/* length: int
+Optional. Return a number of items items up to this value. Minimum value is 1, maximum value is 1000. The default value is 100.
+*/
+
+const transactions = await api('transaction/find', {
+  startDate: '-30',
+  endDate: new Date(),
+  index: 0,
+  length: 100
+})
 ```
 
 MIT Licensed. Enjoy!

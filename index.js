@@ -1,78 +1,74 @@
-const superagent = require('superagent')
-var btoa = require('btoa')
+const request = require('sadope')
+const btoa = require('btoa')
 
-function request(url, options = {}) {
-  const { method = 'get', params = '', auth } = options
-  return new Promise(function(resolve, reject) {
-    superagent[method](url)
-    .send(params)
-    .query({})
-    .set('Authorization', auth)
-    .set('Accept', 'application/json')
-    .end(function(err, res){
-      if (err || !res.ok) {
-        console.log(err)
-        reject(err)
-      } else {
-        resolve(res.body)
-      }
-    })
-  })
+const APIBASE = 'https://publicapi.sbanken.no/apibeta/api/v2/'
+const TOKENURL = 'https://auth.sbanken.no/identityserver/connect/token'
+
+function format(date) {
+  return date.toISOString().split('T')[0]
 }
 
-function getConfig(config) {
-  if (!config) {
-    try {
-      config = require(process.cwd() + '/sbanken.json')
-    } catch(e) {
-      config = {}
-    }
-  }
-  const { clientid, secret } = config
+async function getToken({ clientid, secret }) {
+  const { access_token } = await request(TOKENURL, {
+    method: 'post',
+    params: 'grant_type=client_credentials',
+    auth: 'Basic ' + btoa(encodeURIComponent(clientid) + ':' + encodeURIComponent(secret))
+  })
+  return access_token
+}
+
+module.exports = function({ clientid, secret } = {}) {
   if (!clientid) {
     throw new Error('clientid missing')
   }
   if (!secret) {
     throw new Error('secret missing')
   }
-  return config
-}
 
-function getAccessToken(config) {
-  const { clientid, secret } = getConfig(config)
+  return async function(action, params = {}) {
+    if (action == 'token/create') {
+      return await getToken({ clientid, secret })
+    }
 
-  var url = 'https://auth.sbanken.no/identityserver/connect/token'
+    let token = params.token
+    delete params.token
+    if (!token) {
+      token = await getToken({ clientid, secret })
+    }
 
-  var auth = btoa(encodeURIComponent(clientid) + ':' + encodeURIComponent(secret))
+    if (!token) {
+      throw new Error('token not found')
+    }
 
-  return request(url, {
-    method: 'post',
-    params: 'grant_type=client_credentials',
-    auth: 'Basic ' + auth
-  })
-}
+    const auth = { auth: 'Bearer ' + token }
 
-function getAccountDetails(token) {
-  var url = 'https://publicapi.sbanken.no/apibeta/api/v2/accounts/'
+    // Find all accounts
+    if (action == 'account/find') {
+      return request(APIBASE + 'accounts', auth)
+    }
 
-  return request(url, { auth: 'Bearer ' + token })
-}
+    // Get single account
+    if (action == 'account/get') {
+      const { id } = params
+      if (!id) {
+        throw new Error("required parameter 'id' missing")
+      }
+      return request(APIBASE + 'accounts/' + id, auth)
+    }
 
-function getAccountNumberDetails(accountNumber, token) {
-  var url = 'https://publicapi.sbanken.no/apibeta/api/v2/accounts/' + accountNumber
-
-  return request(url, { auth: 'Bearer ' + token })
-}
-
-function getAccountTransactions(accountNumber, token) {
-  var url = 'https://publicapi.sbanken.no/apibeta/api/v2/transactions/' + accountNumber
-
-  return request(url, { auth: 'Bearer ' + token })
-}
-
-module.exports = {
-  getAccessToken,
-  getAccountDetails,
-  getAccountNumberDetails,
-  getAccountTransactions
+    // Get transactions for account
+    if (action == 'transaction/find') {
+      const { id, ...query } = params
+      if (!id) {
+        throw new Error("required parameter 'id' missing")
+      }
+      if (typeof query.startDate == 'object') {
+        query.startDate = format(query.startDate)
+      }
+      if (typeof query.endDate == 'object') {
+        query.endDate = format(query.endDate)
+      }
+      return request(APIBASE + 'transactions/' + id, auth, query)
+    }
+  }
 }
