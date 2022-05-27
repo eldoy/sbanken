@@ -19,6 +19,9 @@ const api = require('sbanken')({
   secret: 'APP_SECRET'
 })
 
+// Get access token
+const token = await api('token/create')
+
 // Get accounts
 const accounts = await api('account/find')
 
