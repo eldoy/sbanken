@@ -8,15 +8,14 @@ function format(date) {
   return date.toISOString().split('T')[0]
 }
 
-async function getToken({ clientid, secret }) {
-  const { data } = await request(TOKENURL, {
+function getToken({ clientid, secret }) {
+  return request(TOKENURL, {
     method: 'post',
     params: 'grant_type=client_credentials',
     auth:
       'Basic ' +
       btoa(encodeURIComponent(clientid) + ':' + encodeURIComponent(secret))
   })
-  return data.access_token
 }
 
 module.exports = function ({ clientid, secret } = {}) {
@@ -29,25 +28,25 @@ module.exports = function ({ clientid, secret } = {}) {
 
   return async function (action, params = {}) {
     if (action == 'token/create') {
-      return await getToken({ clientid, secret })
+      return getToken({ clientid, secret })
     }
 
     let token = params.token
     delete params.token
     if (!token) {
-      token = await getToken({ clientid, secret })
+      const { data } = await getToken({ clientid, secret })
+      token = data.access_token
     }
 
     if (!token) {
-      throw new Error('token not found')
+      throw new Error('access token not found')
     }
 
     const auth = 'Bearer ' + token
 
     // Find all accounts
     if (action == 'account/find') {
-      const { data } = await request(APIBASE + 'accounts', { auth })
-      return data
+      return request(APIBASE + 'accounts', { auth })
     }
 
     // Get single account
@@ -56,8 +55,7 @@ module.exports = function ({ clientid, secret } = {}) {
       if (!id) {
         throw new Error("required parameter 'id' missing")
       }
-      const response = await request(APIBASE + 'accounts/' + id, { auth })
-      return response.data
+      return request(APIBASE + 'accounts/' + id, { auth })
     }
 
     // Get transactions for account
@@ -72,11 +70,10 @@ module.exports = function ({ clientid, secret } = {}) {
       if (typeof query.endDate == 'object') {
         query.endDate = format(query.endDate)
       }
-      const response = await request(APIBASE + 'transactions/' + account_id, {
+      return request(APIBASE + 'transactions/' + account_id, {
         auth,
         query
       })
-      return response.data
     }
   }
 }

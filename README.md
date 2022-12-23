@@ -20,10 +20,13 @@ const api = require('sbanken')({
 })
 
 // Get access token
-const token = await api('token/create')
+const { data } = await api('token/create')
+{
+  access_token: 'TOKEN'
+}
 
 // Get accounts
-const accounts = await api('account/find')
+const { data } = await api('account/find')
 
 // Example response
 {
@@ -44,7 +47,7 @@ const accounts = await api('account/find')
 
 // Get account info
 // 'id' is the accountId from account/find, not the actual account number
-const account = await api('account/get', { id })
+const { data } = await api('account/get', { id })
 
 // Get transactions
 /* account_id: string
@@ -67,7 +70,7 @@ Optional. The index of the first item to be retrieved. Minimum value is 0, which
 Optional. Return a number of items items up to this value. Minimum value is 1, maximum value is 1000. The default value is 100.
 */
 
-const transactions = await api('transaction/find', {
+const { data } = await api('transaction/find', {
   account_id: '93454A0332...',
   startDate: '-30',
   endDate: new Date(),
