@@ -70,7 +70,7 @@ module.exports = function ({ clientid, secret } = {}) {
       if (typeof query.endDate == 'object') {
         query.endDate = format(query.endDate)
       }
-      return request(APIBASE + 'transactions/' + account_id, {
+      return request(APIBASE + 'transactions/archive/' + account_id, {
         auth,
         query
       })
