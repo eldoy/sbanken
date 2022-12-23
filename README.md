@@ -22,7 +22,10 @@ const api = require('sbanken')({
 // Get access token
 const { data } = await api('token/create')
 {
-  access_token: 'TOKEN'
+  access_token: 'TOKENSTRING',
+  expires_in: 3600,
+  token_type: 'Bearer',
+  scope: 'GW.ApiBetaCustomer'
 }
 
 // Get accounts
