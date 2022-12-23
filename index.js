@@ -9,15 +9,17 @@ function format(date) {
 }
 
 async function getToken({ clientid, secret }) {
-  const { access_token } = await request(TOKENURL, {
+  const { data } = await request(TOKENURL, {
     method: 'post',
     params: 'grant_type=client_credentials',
-    auth: 'Basic ' + btoa(encodeURIComponent(clientid) + ':' + encodeURIComponent(secret))
+    auth:
+      'Basic ' +
+      btoa(encodeURIComponent(clientid) + ':' + encodeURIComponent(secret))
   })
-  return access_token
+  return data.access_token
 }
 
-module.exports = function({ clientid, secret } = {}) {
+module.exports = function ({ clientid, secret } = {}) {
   if (!clientid) {
     throw new Error('clientid missing')
   }
@@ -25,7 +27,7 @@ module.exports = function({ clientid, secret } = {}) {
     throw new Error('secret missing')
   }
 
-  return async function(action, params = {}) {
+  return async function (action, params = {}) {
     if (action == 'token/create') {
       return await getToken({ clientid, secret })
     }
@@ -44,7 +46,8 @@ module.exports = function({ clientid, secret } = {}) {
 
     // Find all accounts
     if (action == 'account/find') {
-      return request(APIBASE + 'accounts', { auth })
+      const { data } = await request(APIBASE + 'accounts', { auth })
+      return data
     }
 
     // Get single account
@@ -53,7 +56,8 @@ module.exports = function({ clientid, secret } = {}) {
       if (!id) {
         throw new Error("required parameter 'id' missing")
       }
-      return request(APIBASE + 'accounts/' + id, { auth })
+      const response = await request(APIBASE + 'accounts/' + id, { auth })
+      return response.data
     }
 
     // Get transactions for account
@@ -68,7 +72,11 @@ module.exports = function({ clientid, secret } = {}) {
       if (typeof query.endDate == 'object') {
         query.endDate = format(query.endDate)
       }
-      return request(APIBASE + 'transactions/' + account_id, { auth, query })
+      const response = await request(APIBASE + 'transactions/' + account_id, {
+        auth,
+        query
+      })
+      return response.data
     }
   }
 }
